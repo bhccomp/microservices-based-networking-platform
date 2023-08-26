@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+
+  # User Service
+  user-service:
+    build: 
+      context: ./user-service
+    container_name: user_service_container
+    ports:
+      - "8001:80"
+    environment:
+      DATABASE_URL: mysql://user_service_user:user_service_password@database:3306/user_service_db
+    depends_on:
+      - database
+
+  # Posts Service
+  posts-service:
+    build: 
+      context: ./posts-service
+    container_name: posts_service_container
+    ports:
+      - "8002:80"
+    environment:
+      DATABASE_URL: mysql://posts_service_user:posts_service_password@database:3306/posts_service_db
+    depends_on:
+      - database
+
+  # Likes Service
+  likes-service:
+    build: 
+      context: ./likes-service
+    container_name: likes_service_container
+    ports:
+      - "8003:80"
+    environment:
+      DATABASE_URL: mysql://likes_service_user:likes_service_password@database:3306/likes_service_db
+    depends_on:
+      - database
+
+  # Direct Communication Service
+  communication-service:
+    build: 
+      context: ./communication-service
+    container_name: communication_service_container
+    ports:
+      - "8004:80"
+    environment:
+      DATABASE_URL: mysql://communication_service_user:communication_service_password@database:3306/communication_service_db
+    depends_on:
+      - database
+
+  # Database
+  database:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
