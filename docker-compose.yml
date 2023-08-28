@@ -6,11 +6,14 @@ services:
   user-service:
     build: 
       context: ./user-service
+      dockerfile: Dockerfile
     container_name: user_service_container
     ports:
       - "8001:80"
     environment:
       DATABASE_URL: mysql://user_service_user:user_service_password@database:3306/user_service_db
+    volumes:
+      - ./user-service:/app
     depends_on:
       - database
 
@@ -18,11 +21,14 @@ services:
   posts-service:
     build: 
       context: ./posts-service
+      dockerfile: Dockerfile
     container_name: posts_service_container
     ports:
       - "8002:80"
     environment:
       DATABASE_URL: mysql://posts_service_user:posts_service_password@database:3306/posts_service_db
+    volumes:
+      - ./posts-service:/app
     depends_on:
       - database
 
@@ -30,11 +36,14 @@ services:
   likes-service:
     build: 
       context: ./likes-service
+      dockerfile: Dockerfile
     container_name: likes_service_container
     ports:
       - "8003:80"
     environment:
       DATABASE_URL: mysql://likes_service_user:likes_service_password@database:3306/likes_service_db
+    volumes: 
+      - ./likes-service:/app
     depends_on:
       - database
 
@@ -42,11 +51,14 @@ services:
   communication-service:
     build: 
       context: ./communication-service
+      dockerfile: Dockerfile
     container_name: communication_service_container
     ports:
       - "8004:80"
     environment:
       DATABASE_URL: mysql://communication_service_user:communication_service_password@database:3306/communication_service_db
+    volumes:
+      - ./communication-service:/app
     depends_on:
       - database
 
@@ -58,3 +70,6 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  db_data:
