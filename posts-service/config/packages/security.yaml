@@ -1,44 +1,22 @@
 security:
-    password_hashers:
-        App\Entity\User:
-            algorithm: auto
-
     providers:
-        app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: email
+        jwt:
+            lexik_jwt:
+                class: App\Security\User
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        register:
-            pattern: ^/api/register
-            stateless: true
-            security: false
-
-        login:
-            pattern:  ^/api/login
-            stateless: true
-            json_login:
-                check_path: /api/login_check
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
         api:
-            pattern:   ^/api
+            pattern: ^/api
             stateless: true
+            provider: jwt
             jwt: ~
 
-        main:
-            lazy: true
-            provider: app_user_provider
-
     access_control:
-        - { path: ^/api/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY } # If you have a login endpoint on posts-service, though you might not need one
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

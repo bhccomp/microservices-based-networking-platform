@@ -2,38 +2,39 @@
 
 namespace App\Controller;
 
+use App\Service\AuthenticationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 
 class SecurityController extends AbstractController
 {
-
-    /**
-     * @Route("/api/login_check", name="login", methods={"POST"})
-     */
-    public function login(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
+    #[Route(path: '/api/login_check', name: 'login', methods: ['POST'])]
+    public function login(
+        Request $request, 
+        AuthenticationService $authenticationService
+    ): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $username = $data['username'];
-        $password = $data['password'];
+        $username = $data['username'] ?? null;
+        $password = $data['password'] ?? null;
 
-        $user = $userRepository->findOneBy(['username' => $username]);
+        if (null === $username || null === $password) {
+            return new JsonResponse(
+                ['error' => 'Missing credentials'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
 
-        if (!$user || !$passwordEncoder->isPasswordValid($user, $password)) {
+        $jwtToken = $authenticationService->getJWTForUser($username, $password);
+
+        if (null === $jwtToken) {
             throw new CustomUserMessageAuthenticationException('Invalid credentials');
         }
 
-        $token = new UsernamePasswordToken($user, $password, 'main', $user->getRoles());
-        $jwtToken = $this->container->get('lexik_jwt_authentication.encoder')
-            ->encode(
-                ['username' => $token->getUser()->getUsername()]
-            );
-
-        return new JsonResponse(
-            ['token' => $jwtToken]
-        );
+        return new JsonResponse(['token' => $jwtToken]);
     }
-
 }
+
