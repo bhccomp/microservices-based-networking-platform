@@ -4,6 +4,9 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Event\UserRegisteredEvent;
+use EventListener\UserRegistrationListener;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -14,17 +17,20 @@ class RegistrationService
     private $passwordEncoder;
     private $validator;
     private $userRepository;
+    private $eventDispatcher;
 
     public function __construct(
         EntityManagerInterface $entityManager, 
         UserPasswordHasherInterface $passwordEncoder, 
         ValidatorInterface $validator,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->entityManager = $entityManager;
         $this->passwordEncoder = $passwordEncoder;
         $this->validator = $validator;
         $this->userRepository = $userRepository;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function registerUser(array $data): User
@@ -52,6 +58,11 @@ class RegistrationService
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        // Dispatch the event so user can be emailed by Email Service via message queue
+        $event = new UserRegisteredEvent($user);
+        #$this->eventDispatcher->addSubscriber(new UserRegistrationListener());
+        $this->eventDispatcher->dispatch($event, UserRegisteredEvent::NAME);
 
         return $user;
     }

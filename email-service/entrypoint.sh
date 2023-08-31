@@ -12,7 +12,5 @@ fi
 service nginx start
 php-fpm
 
-
 # Start supervisord in the foreground. This will also manage php-fpm if it's configured in supervisor.
 /usr/bin/supervisord -n -c /etc/supervisor/supervisord.conf
-

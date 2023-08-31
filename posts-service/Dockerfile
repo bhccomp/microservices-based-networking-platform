@@ -8,12 +8,16 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libxml2-dev \
     libzip-dev \
+    librabbitmq-dev \
     unzip \
     && docker-php-ext-install \
     gd \
     intl \
     pdo_mysql \
-    zip
+    zip \
+    && pecl install amqp \
+    && docker-php-ext-enable amqp
+
 
 # Remove default Nginx configuration
 RUN rm /etc/nginx/sites-enabled/default
