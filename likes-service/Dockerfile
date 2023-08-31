@@ -18,14 +18,11 @@ RUN apt-get update && apt-get install -y \
 # Remove default Nginx configuration
 RUN rm /etc/nginx/sites-enabled/default
 
-# Copy your Nginx site configuration to the container. This should be set up to forward PHP requests to php-fpm.
+# Copy your Nginx site configuration to the container.
 COPY ./docker/app.conf /etc/nginx/sites-available/
 
 # Create a symbolic link to enable the site
 RUN ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/
-
-# Start Nginx and PHP-FPM
-CMD service nginx start && php-fpm
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -35,6 +32,8 @@ WORKDIR /app
 
 # Copy the PHP application to the container.
 COPY . /app
+
+RUN chown -R www-data:www-data /app/var
 
 EXPOSE 80
 

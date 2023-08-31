@@ -34,13 +34,17 @@ COPY . /app
 COPY ./docker/app.conf /etc/nginx/sites-available/
 RUN ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/
 
-# Copy supervisor configuration
-COPY ./docker/messenger_worker.conf /etc/supervisor/conf.d/messenger_worker.conf
+# Install Supervisor
+RUN apt-get update && apt-get install -y supervisor && rm -rf /var/lib/apt/lists/*
 
-# Custom entrypoint to manage both nginx and supervisord
-COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Copy supervisor configuration
+COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+RUN chown -R www-data:www-data /app/var
 
 EXPOSE 80
+
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

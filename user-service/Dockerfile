@@ -27,17 +27,16 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the PHP application to the container.
+# Copying the PHP application to the container.
 COPY . /app
 
-# Copy your Nginx site configuration to the container. 
+# Copying Nginx site configuration to the container. 
 COPY ./docker/app.conf /etc/nginx/sites-available/
 RUN ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/
 
-# Copy supervisor configuration
-COPY ./docker/messenger_worker.conf /etc/supervisor/conf.d/messenger_worker.conf
+RUN chown -R www-data:www-data /app/var
 
-# Custom entrypoint to manage both nginx and supervisord
+# Custom entrypoint
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

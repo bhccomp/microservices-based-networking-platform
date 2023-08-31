@@ -3,17 +3,15 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use App\Service\PostService;
 
 class PostController extends AbstractController
 {
-
     #[Route(path: '/api/posts', name: 'list_post', methods: ['GET'])]
     public function list(PostService $postService): Response
     {
@@ -37,7 +35,6 @@ class PostController extends AbstractController
     #[Route(path: '/api/posts', name: 'create_post', methods: ['POST'])]
     public function create(Request $request, PostService $postService): Response
     {
-
         $user = $this->getUser();
         $authorId = $user->getId();
         $author = $user->getFirstName();
@@ -49,7 +46,6 @@ class PostController extends AbstractController
             ['success' => 'Post created successfully'], 
             Response::HTTP_CREATED
         );
-
     }
     
     #[Route(path: '/api/posts/{id}', name: 'edit_post', methods: ['PUT'])]
@@ -78,5 +74,4 @@ class PostController extends AbstractController
             return new JsonResponse(['error' => 'Access denied'], Response::HTTP_FORBIDDEN);
         }
     }
-
 }

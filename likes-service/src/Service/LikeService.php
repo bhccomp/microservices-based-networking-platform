@@ -19,25 +19,52 @@ class LikeService
 
     public function saveLike(int $postId, int $userId)
     {
-        $like = new Like();
-        $like->setPostId($postId);
-        $like->setUserId($userId);
-        $like->setDateLiked(new \DateTime());
+        // Check if the user has already liked the post
+        if ($this->isLiked($postId, $userId)) {
+            throw new \Exception("User has already liked this post");
+        }
 
-        $this->entityManager->persist($like);
-        $this->entityManager->flush();
+        $this->entityManager->beginTransaction();
+
+        try {
+            $like = new Like();
+            $like->setPostId($postId);
+            $like->setUserId($userId);
+            $like->setDateLiked(new \DateTime());
+
+            $this->entityManager->persist($like);
+            $this->entityManager->flush();
+
+            $this->entityManager->commit();
+        } catch (\Exception $e) {
+            $this->entityManager->rollback();
+            throw $e;
+        }
     }
 
-    public function deleteLike(int $postId, int $userId): void
+    public function deleteLike(int $postId, int $userId): bool
     {   
         $like = $this->likeRepository->findOneBy([
             'user_id' => $userId,
             'post_id' => $postId
         ]);
 
-        if ($like) {
+        if (!$like) {
+            return false;
+        }
+
+        $this->entityManager->beginTransaction();
+
+        try {
             $this->entityManager->remove($like);
             $this->entityManager->flush();
+
+            $this->entityManager->commit();
+
+            return true;
+        } catch (\Exception $e) {
+            $this->entityManager->rollback();
+            throw $e;
         }
     }
 

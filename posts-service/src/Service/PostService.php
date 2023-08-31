@@ -5,10 +5,10 @@ namespace App\Service;
 use App\Entity\Post;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class PostService
 {
-    
     private $entityManager;
     private $postRepository;
 
@@ -33,11 +33,15 @@ class PostService
         return $post;
     }
 
-    public function updatePost(int $id, array $data): ?Post
+    public function updatePost(int $id, array $data, $user): ?Post
     {
-        $post = $this->entityManager->getRepository(Post::class)->find($id);
+        $post = $this->postRepository->find($id);
         if (!$post) {
             return null;
+        }
+
+        if ($post->getAuthorId() !== $user->getId()) {
+            throw new AccessDeniedException();
         }
 
         if (isset($data['title'])) {
@@ -54,15 +58,19 @@ class PostService
         return $post;
     }
 
-    public function deletePost(int $id): bool
+    public function deletePost(int $id, $user): bool
     {
-        $post = $this->em->getRepository(Post::class)->find($id);
+        $post = $this->entityManager->getRepository(Post::class)->find($id);
         if (!$post) {
             return false;
         }
 
-        $this->em->remove($post);
-        $this->em->flush();
+        if ($post->getAuthorId() !== $user->getId()) {
+            throw new AccessDeniedException();
+        }
+
+        $this->entityManager->remove($post);
+        $this->entityManager->flush();
 
         return true;
     }
@@ -99,5 +107,4 @@ class PostService
             'publication_date' => $post->getPublicationDate()
         ];
     }
-
 }

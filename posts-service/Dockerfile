@@ -28,17 +28,16 @@ COPY ./docker/app.conf /etc/nginx/sites-available/
 # Create a symbolic link to enable the site
 RUN ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/
 
-# Start Nginx and PHP-FPM
-CMD service nginx start && php-fpm
-
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the PHP application to the container.
+# Copying the PHP application to the container.
 COPY . /app
+
+RUN chown -R www-data:www-data /app/var
 
 EXPOSE 80
 

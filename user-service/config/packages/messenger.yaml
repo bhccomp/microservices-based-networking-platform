@@ -1,13 +1,16 @@
 framework:
     messenger:
+        failure_transport: failed
+
         transports:
-            my_transport:
+            emails:
                 dsn: "%env(MESSENGER_TRANSPORT_DSN)%"
                 options:
                     auto_setup: true
-
+            failed: 'doctrine://default?queue_name=failed'
+            
         routing:
-            'App\Message\EmailNotification': my_transport
+            'App\Message\EmailNotification': emails
 
 
 # when@test:

@@ -56,7 +56,7 @@ services:
     ports:
       - "8004:80"
     environment:
-      DATABASE_URL: mysql://communication_service_user:communication_service_password@database:3306/communication_service_db
+      DATABASE_URL: mysql://communication_service_user:communication_password@database:3306/communication_service_db
     volumes:
       - ./communication-service:/app
     depends_on:
@@ -87,13 +87,14 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=user
       - RABBITMQ_DEFAULT_PASS=password
-  #rabbitmq-setup:
-    #build:
-      #context: .
-      #dockerfile: Dockerfile.rabbitmqsetup
-    #depends_on:
-      #- rabbitmq
 
+  rabbitmq-setup:
+    build: 
+      context: .
+      dockerfile: Dockerfile.rabbitmq-setup
+    depends_on:
+      - rabbitmq
+      
   # MailHog 
   mailhog:
     image: mailhog/mailhog
