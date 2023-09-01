@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use OpenApi\Annotations as OA;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -23,6 +24,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
+    /**
+     * @OA\Property(
+     *     type="array",
+     *     @OA\Items(type="string")
+     * )
+     */
     #[ORM\Column]
     private array $roles = [];
 
@@ -39,9 +46,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $profileImagePath = null;
 
     public function getId(): ?int
     {
@@ -133,18 +137,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
-
-        return $this;
-    }
-
-    public function getProfileImagePath(): ?string
-    {
-        return $this->profileImagePath;
-    }
-
-    public function setProfileImagePath(?string $profileImagePath): static
-    {
-        $this->profileImagePath = $profileImagePath;
 
         return $this;
     }
