@@ -33,8 +33,6 @@ WORKDIR /app
 # Copy the PHP application to the container.
 COPY . /app
 
-RUN chown -R www-data:www-data /app/var
-
 EXPOSE 80
 
 COPY ./entrypoint.sh /entrypoint.sh

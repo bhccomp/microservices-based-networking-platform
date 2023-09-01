@@ -40,8 +40,6 @@ RUN apt-get update && apt-get install -y supervisor && rm -rf /var/lib/apt/lists
 # Copy supervisor configuration
 COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-RUN chown -R www-data:www-data /app/var
-
 EXPOSE 80
 
 COPY ./entrypoint.sh /entrypoint.sh
