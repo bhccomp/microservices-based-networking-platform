@@ -71,4 +71,5 @@ After the succussful build, these will be the available services:
   - `/user-service/entrypoint.sh`
 This is required only at the first startup so Symfony can do it's migrations and create required tables. I know I should have automated this as well but I completely forgot about it. :)
 
-- For testing purposes, I created a new server/droplet at Digital Ocean, cloned and executed `docker-compose up --build` and everything works. You can access all these services by accessing this 164.92.161.30 instead of localhost, just make sure you're accessing services using the ports above. 
+- For testing purposes, I created a new server/droplet at Digital Ocean, cloned and executed `docker-compose up --build` and everything works. You can access all these services by accessing this 164.92.161.30 instead of localhost, just make sure you're accessing services using the ports above.
+- I am aware that I am missing logging and tests, this is something I would definitely work on if I had more time. 
