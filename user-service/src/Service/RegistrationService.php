@@ -59,11 +59,28 @@ class RegistrationService
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        // Dispatch the event so user can be emailed by Email Service via message queue
         $event = new UserRegisteredEvent($user);
-        #$this->eventDispatcher->addSubscriber(new UserRegistrationListener());
         $this->eventDispatcher->dispatch($event, UserRegisteredEvent::NAME);
 
         return $user;
     }
+    
+    public function updateProfileImagePath(int $userId, string $filename): User
+    {
+
+        $userRepo = $this->entityManager->getRepository(User::class);
+        $user = $userRepo->find($userId);
+
+        if (!$user) {
+            throw new \Exception("User with ID {$userId} not found.");
+        }
+
+        $user->setProfileImagePath($filename);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
+    }
+    
 }
