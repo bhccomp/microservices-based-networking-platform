@@ -9,6 +9,10 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+        doc:
+            pattern: ^/api/doc
+            security: false
+
         api:
             pattern: ^/api
             stateless: true
@@ -17,6 +21,7 @@ security:
 
     access_control:
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/doc, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

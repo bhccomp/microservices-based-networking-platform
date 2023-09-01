@@ -7,7 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Tag(name="Conversations")
+ */
 #[Route('/api/conversations')]
 class ConversationController extends AbstractController
 {
@@ -18,6 +22,17 @@ class ConversationController extends AbstractController
         $this->conversationService = $conversationService;
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/conversations",
+     *     tags={"Conversations"},
+     *     summary="List user's conversations",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Returns a list of conversations for the user"
+     *     )
+     * )
+     */
     #[Route('/', name: 'conversation_index', methods: ['GET'])]
     public function index(): JsonResponse
     {
@@ -27,6 +42,27 @@ class ConversationController extends AbstractController
         return new JsonResponse($conversations);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/conversations/{id}",
+     *     tags={"Conversations"},
+     *     summary="Show details of a conversation",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the conversation",
+     *         required=true
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Returns details of the conversation"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Conversation not found or not authorized."
+     *     )
+     * )
+     */
     #[Route('/{id}', name: 'conversation_show', methods: ['GET'])]
     public function show(int $id): JsonResponse
     {
@@ -40,6 +76,25 @@ class ConversationController extends AbstractController
         return new JsonResponse($conversation);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/conversations",
+     *     tags={"Conversations"},
+     *     summary="Create a new conversation",
+     *     @OA\RequestBody(
+     *         description="Data to create a new conversation",
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="user2_id", type="integer", description="ID of the second user in the conversation")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Conversation created successfully"
+     *     )
+     * )
+     */
     #[Route('/', name: 'conversation_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
